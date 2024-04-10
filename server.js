@@ -3,8 +3,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const passport = require('passport');
-const { passportConfig } = require('./config/passport.config');
 const MongoStore = require('connect-mongo');
 const listings = require('./routes/mentalListingRoute');
 const authRouter = require('./routes/authRoutes');
@@ -16,18 +14,6 @@ const sessionSecret = process.env.SESSION_SECRET;
 //Session setup
 const sessionStore = MongoStore.create({ mongoUrl: 'mongodb://127.0.0.1/SuubiMentalWellness'});
 
-app.use(session({
-    secret: sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-    store: sessionStore
-}));
-
-//Passport setup
-app.use(passport.initialize());
-app.use(passportConfig.initialize());
-app.use(passport.session());
-app.use(passportConfig.session());
 
 //middleware
 app.use(express.json());
