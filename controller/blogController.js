@@ -1,5 +1,6 @@
 const suubiArticles  = require('../models/article.model');
 
+//get all posts
 const blogPosts = async(req, res) => {
     try {
         const blog = await suubiArticles.find({});
@@ -10,6 +11,7 @@ const blogPosts = async(req, res) => {
     }
 }
 
+//get a single post by ID
 const idBlogPosts = async(req, res) => {
     try {
         const { id } = req.params;
@@ -20,7 +22,19 @@ const idBlogPosts = async(req, res) => {
     }
 }
 
+//create a new blog post
+const createBlogPost = async(req, res) => {
+    try {
+        const post = req.body;
+        const createNewPost = await suubiArticles.create(post);
+        return res.status(201).json(createNewPost);
+    } catch (error) {
+        res.status(500).json({ error: error.message})
+    }
+}
+
 module.exports = {
     blogPosts,
-    idBlogPosts
+    idBlogPosts,
+    createBlogPost
 }
