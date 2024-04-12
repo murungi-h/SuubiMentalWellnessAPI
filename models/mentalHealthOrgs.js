@@ -23,7 +23,6 @@ const orgProviders = mongoose.Schema(
             type: String,
             required: false,
             validator: [isEmail, 'Please enter a valid email'],
-            unique: true
         },
         "web" : {
             type: String,
