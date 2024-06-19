@@ -1,10 +1,10 @@
 const express = require('express');
-const { blogPosts, idBlogPosts, createBlogPost }= require('../controller/blogController');
+const { blogPosts, idBlogPosts, createBlogPost }= require('../controller/blog.controller');
 
 const router = express.Router();
 
 //get all blog posts
-router.get('/posts', blogPosts)
+router.get('/posts', blogPosts);
 
 //get all blog posts by id
 router.get('/posts/:id', idBlogPosts);

@@ -1,86 +1,58 @@
-const passport = require('passport');
-const User = require('../models/userModel');
+// controllers/authController.js
+const bcrypt = require('bcryptjs');
+const jwt = require('jwt-simple');
+const User = require('../models/User');
+const { JWT_SECRET } = require('../config/keys');
+const { generateJWT } = require('../config/passport');
 
-//Local strategy
-const localStrategy = async (email, password, done) => {
-try {
-    const user = await User.findOne ({ email });
-    if(!user) {
-        return done(null, false, { message: 'Incorrect email or password' });
-    }
-    const isMatch = await User.comparePassword(password);
-    if(!isMatch) {
-        return done(null, false, { message: 'Incorrect email and password' });
-    }
-    return done(null, user);
-    } catch(error) {
-        return done(error);
-    }
+exports.register = async (req, res) => {
+  const { username, email, password } = req.body;
+  try {
+    let user = await User.findOne({ email });
+    if (user) return res.status(400).json({ message: 'Email already exists' });
+
+    user = new User({ username, email, password });
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    await user.save();
+
+    const token = generateJWT(user);
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-//Google strategy
-const googleStrategy = async (accessToken, refreshToken, profile, done) => {
-    try {
-        const existingUser = await User.findOne({ googleId: profile.id});
-        if (existingUser) {
-            return done(null, existingUser);
-        }
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: 'Invalid email or password' });
 
-        const newUser = new User({
-            googleId: profile.id,
-            email: profile.emails[0].value
-        });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: 'Invalid email or password' });
 
-        const savedUser = await newUser.save();
-        return done(null, savedUser);
-    } catch (error) {
-        return done(error);
-    }
+    const token = generateJWT(user);
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-//Facebook strategy
-const facebookStrategy = async (accessToken, refreshToken, profile, done) => {
-    try {
-        const existingUser = await User.findOne({ facebookId: profile.id});
-        if (existingUser) {
-            return done(null, existingUser);
-        }
-
-        const newUser = new User({
-            facebookId: profile.id,
-            email: profile.emails[0].value
-        });
-
-        const savedUser = await newUser.save();
-        return done(null, savedUser);
-    } catch (error) {
-        return done(error);
-    }
+exports.googleAuth = async (req, res) => {
+  // Redirect to client with token or handle as necessary
+  const token = generateJWT(req.user);
+  res.json({ token });
 };
 
-//Microsoft strategy
-const microsoftStrategy = async (accessToken, refreshToken, profile, done) => {
-    try {
-        const existingUser = await User.findOne({ microsoftId: profile.id});
-        if (existingUser) {
-            return done(null, existingUser);
-        }
-
-        const newUser = new User({
-            microsoftId: profile.id,
-            email: profile.emails[0].value
-        });
-
-        const savedUser = await newUser.save();
-        return done(null, savedUser);
-    } catch (error) {
-        return done(error);
-    }
+exports.facebookAuth = async (req, res) => {
+  // Redirect to client with token or handle as necessary
+  const token = generateJWT(req.user);
+  res.json({ token });
 };
 
-module.exports = {
-    localStrategy,
-    googleStrategy,
-    facebookStrategy,
-    microsoftStrategy
+exports.microsoftAuth = async (req, res) => {
+  // Redirect to client with token or handle as necessary
+  const token = generateJWT(req.user);
+  res.json({ token });
 };

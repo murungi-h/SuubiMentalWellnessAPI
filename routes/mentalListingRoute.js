@@ -1,5 +1,5 @@
 const express = require('express');
-const { postOrgData, getAllOrgs, getOneOrg, } = require('../controller/mentalOrgController');
+const { postOrgData, getAllOrgs, getOneOrg, } = require('../controller/mentalorg.controller');
 const router = express.Router();
 
 //route for adding organisations.

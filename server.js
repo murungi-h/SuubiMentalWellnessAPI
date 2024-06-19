@@ -6,6 +6,10 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const listings = require('./routes/mentalListingRoute');
 const blogRouter = require('./routes/blogRoutes');
+const articleRouter = require('./routes/articleRoutes');
+const passport = require('passport');
+const passportConfig = require('./config/passport.config');
+
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -22,6 +26,10 @@ app.use(cookieParser());
 
 app.use('/api/listings', listings);
 app.use('/api/blogs', blogRouter);
+app.use('/api/articles', articleRouter);
+
+app.use(passport.initialize());
+// passportConfig(passport);
 
 //connecting to localDB instance
 mongoose.connect('mongodb://127.0.0.1/SuubiMentalWellness').then(console.log('MongoDB Connected'));
