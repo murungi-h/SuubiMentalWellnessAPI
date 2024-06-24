@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAllArticles, getOneArticle }  = require('../controller/article.controller');
+const { getAllArticles, getOneArticle }  = require('../controller/articleController');
 const router = express.Router();
 
 //get all articles from database
